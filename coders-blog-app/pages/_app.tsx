@@ -9,6 +9,7 @@ export default function App({ Component, pageProps }: AppProps) {
       <div className="container mx-auto font-sans">
         <NavBar />
         <main>
+          
           <Component {...pageProps} />
         </main>
         <Footer />

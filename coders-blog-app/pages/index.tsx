@@ -1,9 +1,22 @@
 import Head from "next/head";
 import { Inter } from "next/font/google";
+import { GetServerSideProps, NextPage } from "next";
+import { fetchArticles, fetchCategories } from "@/http";
+import axios, { AxiosResponse } from "axios";
+import { IArticle, ICategory, ICollectionResponse } from "@/types";
+import Tabs from "@/components/Tabs";
+import ArticleList from "@/components/ArticleList";
 
 const inter = Inter({ subsets: ["latin"] });
 
-export default function Home() {
+interface IPropTypes {
+  categories: {
+    items: ICategory[];
+  };
+  articles: { items: IArticle };
+}
+
+const Home: NextPage<IPropTypes> = ({ categories, articles }) => {
   return (
     <>
       <Head>
@@ -12,11 +25,34 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main>
-        <div>
-          <h1 className="text-primary-dark">Hello world!</h1>
-        </div>
-      </main>
+      <Tabs categories={categories.items} />
+
+      {/* Articles */}
+      <ArticleList articles={articles.items} />
     </>
   );
-}
+};
+
+export default Home;
+
+export const getServerSideProps: GetServerSideProps = async () => {
+  // Fetch() Categories
+  const { data: categories }: AxiosResponse<ICollectionResponse<ICategory[]>> =
+    await fetchCategories();
+
+  // Fetch() Articles
+  const { data: articles }: AxiosResponse<ICollectionResponse<IArticle[]>> =
+    await fetchArticles();
+
+  return {
+    props: {
+      categories: {
+        items: categories.data,
+      },
+      articles: {
+        items: articles.data,
+        pagination: articles.meta.pagination,
+      },
+    },
+  };
+};

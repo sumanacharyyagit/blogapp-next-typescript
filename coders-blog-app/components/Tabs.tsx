@@ -28,7 +28,7 @@ const Tabs = ({ categories }: IPropType) => {
               : "border-primary text-gray-400"
           }`}
         >
-          <Link href={"#"}>Recent</Link>
+          <Link href={"/"}>Recent</Link>
         </li>
         {categories.map((category) => (
           <li
@@ -39,7 +39,7 @@ const Tabs = ({ categories }: IPropType) => {
                 : "border-primary text-gray-400"
             }`}
           >
-            <Link href={`category/${category.attributes.Slug}`}>
+            <Link href={`/category/${category.attributes.Slug}`}>
               {category.attributes.Title}
             </Link>
           </li>

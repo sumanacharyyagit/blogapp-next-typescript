@@ -8,7 +8,7 @@ export default function App({ Component, pageProps }: AppProps) {
     <>
       <div className="container mx-auto font-sans">
         <NavBar />
-        <main>
+        <main className="pb-32">
           
           <Component {...pageProps} />
         </main>

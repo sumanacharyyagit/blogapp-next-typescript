@@ -59,6 +59,7 @@ export interface IArticleAttribute {
   Image: IImageData;
   createdAt: string;
   author: IAuthor;
+  shortDescription: string;
 }
 
 export interface IArticle {
@@ -70,3 +71,5 @@ export interface ICollectionResponse<T> {
   data: T;
   meta: IResourceMeta;
 }
+
+export type TDirection = 1 | -1;

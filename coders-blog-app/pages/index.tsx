@@ -3,9 +3,11 @@ import { Inter } from "next/font/google";
 import { GetServerSideProps, NextPage } from "next";
 import { fetchArticles, fetchCategories } from "@/http";
 import axios, { AxiosResponse } from "axios";
-import { IArticle, ICategory, ICollectionResponse } from "@/types";
+import { IArticle, ICategory, ICollectionResponse, IPagination } from "@/types";
 import Tabs from "@/components/Tabs";
 import ArticleList from "@/components/ArticleList";
+import qs from "qs";
+import Pagination from "@/components/Pagination";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -13,10 +15,12 @@ interface IPropTypes {
   categories: {
     items: ICategory[];
   };
-  articles: { items: IArticle };
+  articles: { items: IArticle; pagination: IPagination };
 }
 
 const Home: NextPage<IPropTypes> = ({ categories, articles }) => {
+  const { page, pageCount } = articles.pagination;
+
   return (
     <>
       <Head>
@@ -29,20 +33,35 @@ const Home: NextPage<IPropTypes> = ({ categories, articles }) => {
 
       {/* Articles */}
       <ArticleList articles={articles.items} />
+      <Pagination page={page} pageCount={pageCount} />
     </>
   );
 };
 
 export default Home;
 
-export const getServerSideProps: GetServerSideProps = async () => {
+export const getServerSideProps: GetServerSideProps = async ({ query }) => {
   // Fetch() Categories
   const { data: categories }: AxiosResponse<ICollectionResponse<ICategory[]>> =
     await fetchCategories();
 
   // Fetch() Articles
+
+  const options = {
+    populate: ["author.avatar"],
+    sort: ["id:desc"],
+    pagination: {
+      page: query.page ? query.page : 1,
+      pageSize: 1,
+    },
+  };
+
+  const queryString = qs.stringify(options);
+
   const { data: articles }: AxiosResponse<ICollectionResponse<IArticle[]>> =
-    await fetchArticles();
+    await fetchArticles(queryString);
+
+  console.log(articles);
 
   return {
     props: {

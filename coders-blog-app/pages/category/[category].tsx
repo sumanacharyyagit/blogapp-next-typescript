@@ -1,14 +1,21 @@
 import Tabs from "@/components/Tabs";
 import { fetchArticles, fetchCategories } from "@/http";
-import { IArticle, ICategory, ICollectionResponse, IPagination } from "@/types";
+import {
+  IArticle,
+  ICategory,
+  ICollectionResponse,
+  IPagination,
+  IQueryOptions,
+} from "@/types";
 import { AxiosResponse } from "axios";
 import { GetServerSideProps } from "next";
 import Head from "next/head";
 import React from "react";
 import qs from "qs";
 import ArticleList from "@/components/ArticleList";
-import { capitalizedFirstLetter, makeCategory } from "@/utils";
+import { capitalizedFirstLetter, debounce, makeCategory } from "@/utils";
 import Pagination from "@/components/Pagination";
+import { useRouter } from "next/router";
 
 interface IPropTypes {
   categories: {
@@ -22,13 +29,19 @@ interface IPropTypes {
   slug: string;
 }
 
-const category = ({ categories, articles, slug }: IPropTypes) => {
+const Category = ({ categories, articles, slug }: IPropTypes) => {
   const { page, pageCount } = articles.pagination;
+
+  const router = useRouter();
+  const { category: categorySlug } = router.query;
 
   const formattedCategory = () => {
     return capitalizedFirstLetter(makeCategory(slug));
   };
-  console.log(categories);
+
+  const handleOnSearch = (val: string) => {
+    router.push(`/category/${categorySlug}/?search=${val}`);
+  };
 
   return (
     <>
@@ -38,15 +51,22 @@ const category = ({ categories, articles, slug }: IPropTypes) => {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Tabs categories={categories.items} />
+      <Tabs
+        categories={categories.items}
+        handleOnSearch={debounce(handleOnSearch, 500)}
+      />
       <ArticleList articles={articles.items} />
-      <Pagination page={page} pageCount={pageCount} />
+      <Pagination
+        page={page}
+        pageCount={pageCount}
+        redirectUrl={`/category/${categorySlug}`}
+      />
     </>
   );
 };
 
 export const getServerSideProps: GetServerSideProps = async ({ query }) => {
-  const options = {
+  const options: Partial<IQueryOptions> = {
     populate: ["author.avatar"],
     sort: ["id:desc"],
     filters: {
@@ -55,10 +75,18 @@ export const getServerSideProps: GetServerSideProps = async ({ query }) => {
       },
     },
     pagination: {
-      page: query.page ? query.page : 1,
+      page: query.page ? +query.page : 1,
       pageSize: 1,
     },
   };
+
+  if (query?.search) {
+    options.filters = {
+      Title: {
+        $containsi: query.search,
+      },
+    };
+  }
 
   const queryString = qs.stringify(options);
 
@@ -83,4 +111,4 @@ export const getServerSideProps: GetServerSideProps = async ({ query }) => {
   };
 };
 
-export default category;
+export default Category;

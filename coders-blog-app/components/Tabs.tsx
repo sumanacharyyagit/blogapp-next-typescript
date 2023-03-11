@@ -5,18 +5,17 @@ import { useRouter } from "next/router";
 
 interface IPropType {
   categories: ICategory[];
+  handleOnSearch: (query) => void;
 }
 
-const Tabs = ({ categories }: IPropType) => {
+const Tabs = ({ categories, handleOnSearch }: IPropType) => {
   const router = useRouter();
 
   const isActiveLink = (category: ICategory) => {
     return category.attributes.Slug === router.query.category;
   };
 
-  const handleOnSearch = (val: string) => {
-    console.log(val);
-  };
+  
 
   return (
     <div className="my-8 flex items-center justify-between border-b-2 border-gray-100">

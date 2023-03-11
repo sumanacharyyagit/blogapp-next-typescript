@@ -11,7 +11,7 @@ interface IPropTypes {
 const BlogCard = ({ article }: IPropTypes) => {
   return (
     <div>
-      <Link href={"#"}>
+      <Link href={`/article/${article.attributes.Slug}`}>
         <h1 className="text-xl text-gray-600 font-bold hover:decoration-2 hover:underline hover:cursor-pointer hover:decoration-primary">
           {article.attributes.Title}
         </h1>
@@ -20,9 +20,10 @@ const BlogCard = ({ article }: IPropTypes) => {
       <div className="flex items-center my-4 ">
         <div className="rounded-lg overflow-hidden flex items-center justify-center mr-2">
           <Image
-            src={`http://localhost:1337${article.attributes.author.data.attributes.avatar.data.attributes.formats.thumbnail.url}`}
+            src={`${process.env.NEXT_PUBLIC_API_BASE_URL}${article.attributes.author.data.attributes.avatar.data.attributes.formats.thumbnail.url}`}
             height={40}
             width={40}
+            alt="author-avatar"
           />
         </div>
         <span className="text-sm font-bold text-gray-600">

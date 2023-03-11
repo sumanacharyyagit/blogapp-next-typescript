@@ -4,7 +4,7 @@ import BlogCard from "./BlogCard";
 import BlogCardWithImage from "./BlogCardWithImage";
 
 interface IPropTypes {
-  articles: IArticle;
+  articles: IArticle[];
 }
 
 const ArticleList = ({ articles }: IPropTypes) => {
